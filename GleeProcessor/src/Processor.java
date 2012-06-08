@@ -17,7 +17,7 @@ public class Processor
 			e.printStackTrace();
 		}
 	}
-	static JFileChooser browser = new JFileChooser("/Users/willstamper/github/Iron/client/public/modes/ready_training");
+	static JFileChooser browser = new JFileChooser("/Users/wxstamper/github/Iron/client/public/modes/ready_training");
 	static ArrayList<String> pNames = new ArrayList<String>();
 	static ArrayList<String> pPaths = new ArrayList<String>();
 	static HashMap<String, String> pathMap = new HashMap<String, String>();
@@ -31,14 +31,15 @@ public class Processor
 		String line = in.readLine();
 		while(line != null)
 		{
-			read(new File(line));
+      String temp = read(new File(line));
 			line = in.readLine();
-      if(line!=null)
-        System.out.print(",");
+      if(line == null)
+		    System.out.println("]");
+      else
+        System.out.print(temp);
 		}
-		System.out.println("]");
 	}
-	public static void read(File f) throws FileNotFoundException
+	public static String read(File f) throws FileNotFoundException
 	{
 		pNames = new ArrayList<String>();
 		pPaths = new ArrayList<String>();
@@ -53,7 +54,7 @@ public class Processor
 				line = in.readLine();
 				whole += line;
 				if(line.contains("[]") || line.contains("()"))
-					return;
+					return("");
 				if(line.contains(")"))
 					break;
 			} 
@@ -73,12 +74,11 @@ public class Processor
 			}
 		} catch (IOException e1)
 		{
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		String paths = whole.substring(whole.indexOf("[")+1, whole.indexOf("]"));
 		if(paths.length()==0)
-			return;
+			return("");
 		String names = whole.substring(whole.indexOf("(")+1, whole.indexOf(")"));
 		String[] splitPaths = paths.split(",");
 		for(String s : splitPaths)
@@ -93,7 +93,7 @@ public class Processor
 		{
 			if(s.length()==0)
 				pPaths.add(s);
-			pNames.add(s.trim());
+			pNames.add(s.trim().replace("\\", ""));
 		}	
 		System.out.println("{\"file\":\"" + f.toString() + "\",\"counts\":[");
 		counts = new int[pNames.size()];
@@ -101,24 +101,11 @@ public class Processor
 		{
 			counts[i] = countString(theRest, pNames.get(i));
 			if(i < pNames.size()-1)
-				System.out.println("{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"") + ",\"count\":\""+counts[i]+"\"},");
+				System.out.println("{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"").replace("\\","") + ",\"count\":\""+counts[i]+"\"},");
 			else
-				System.out.println("{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"") + ",\"count\":\""+counts[i]+"\"}]}");
+				System.out.println("{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"").replace("\\","") + ",\"count\":\""+counts[i]+"\"}]}");
 		}
-	}
-	public static void addToMap()
-	{
-		System.out.println(pNames.size() + " " + pPaths.size());
-		for(int i=0; i<pNames.size(); i++)
-		{
-			String n = pNames.get(i);
-			String p = pPaths.get(i);
-			if(countMap.containsKey(n))
-				countMap.put(n, countMap.get(n)+1);
-			else
-				countMap.put(n, 1);
-			pathMap.put(n, p);
-		}
+    return(",");
 	}
 	public static int countString(String text, String target)
 	{

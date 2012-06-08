@@ -3,67 +3,93 @@
     <title>Glee!</title>
     <script type="text/javascript" src="protovis.min.js"></script>
     <script type="text/javascript" src="counts.js"></script>
+    <script type="text/javascript" src="jquery.min.js"></script>
     <style type="text/css">
 
 #fig {
-  width: 1080px;
-  height: 600px;
+  width: 1880px;
+  height: 800px;
 }
 
     </style>
   </head>
   <body><div id="center"><div id="fig">
-    <script type="text/javascript+protovis">
-
-var vis = new pv.Panel()
-    .width(1180)
-    .height(510)
-    .bottom(90);
-  var files = [];
-  var links = [];
-  for(var i = 0; i < filecounts.length; i++)
-  {
-    files.push(filecounts[i].file.replace("/Users/willstamper/github/iron/client/public/","").replace(".coffee",""));
-  }
-  for(var i = 0; i < filecounts.length; i++)
-{
-    for(var j = 0; j < filecounts[i].counts.length; j++)
-    {
-      var s = i;
-      var t = files.indexOf(filecounts[i].counts[j].path);
-      var v = Number(filecounts[i].counts[j].count);
-      if(v==0)
+  <script type="text/javascript+protovis">
+    var show = [];
+    var vis = new pv.Panel()
+      .width(1880)
+      .height(810)
+      .bottom(90);
+    var files = [];
+    var links = [];
+    var nodes = [];
+    function generateFiles() {
+      files = [];
+      for(var i = 0; i < filecounts.length; i++)
       {
-        console.log(files[i].substring(files[i].lastIndexOf("/")+1) + " imports " + filecounts[i].counts[j].name + " for no reason...");
-      }
-      else if(t!=-1)
-      {
-        links.push({"source":s, "target":t, "value":v});
+        files.push(filecounts[i].file.replace("/Users/wxstamper/github/iron/client/public/","").replace(".coffee",""));
       }
     }
-}
-  var nodes = [];
-  for(var i = 0; i < files.length; i++)
-{
-  var temp = files[i].replace("_view_controller","").replace("_model","");
-  nodes.push({"nodeValue":temp.substring(temp.lastIndexOf("/")+1)});
-}
-  var arc = vis.add(pv.Layout.Arc)
-    .nodes(nodes)
-    .links(links)
-    .sort(function(a,b) b.linkDegree - a.linkDegree)
-
-arc.link.add(pv.Line);
-
-arc.node.add(pv.Dot)
-  .size(function(d) d.linkDegree + 4 )
-    .fillStyle(pv.Colors.category19().by(function(d) d.group))
-    .strokeStyle(function() this.fillStyle().darker());
-
-arc.label.add(pv.Label)
-
-vis.render();
-
+    function generateLinks() {
+      links = [];
+      for(var i = 0; i < filecounts.length; i++)
+      {
+        if(show.indexOf(i)!=-1){
+        for(var j = 0; j < filecounts[i].counts.length; j++)
+        {
+          var s = i;
+          var t = files.indexOf(filecounts[i].counts[j].path);
+          var v = Number(filecounts[i].counts[j].count);
+          if(v==0)
+          {
+            console.log(files[i].substring(files[i].lastIndexOf("/")+1) + " imports " + filecounts[i].counts[j].name + " for no reason...");
+          }
+          else if(t!=-1)
+          {
+            links.push({"source":s, "target":t, "value":v});
+          }
+        }}
+      }
+    }
+    function generateNodes() {
+      nodes = [];
+      for(var i = 0; i < files.length; i++)
+      {
+        var temp = files[i].replace("_view_controller","");
+        nodes.push({"nodeValue":temp.substring(temp.lastIndexOf("/")+1)});
+      }
+    }
+    generateFiles();
+    generateLinks();
+    generateNodes();
+    var arc = null;
+    var nodeMark = null;
+    var labels = null;
+    var linkMarks = null;
+    function drawArcs() {
+      arc = vis.add(pv.Layout.Arc)
+        .nodes(nodes)
+        .links(links)
+    }
+    drawArcs();
+    linkMarks = arc.link.add(pv.Line)
+    labels = arc.label.add(pv.Label)
+    nodeMarks = arc.node.add(pv.Dot)
+      .size(function(d) d.linkDegree + 4 )
+      .fillStyle(pv.Colors.category19().by(function(d) d.group))
+      .strokeStyle(function() this.fillStyle().darker())
+      .event("click", function() {
+        console.log(this.index);
+        show.push(this.index);
+        generateFiles();
+        generateLinks();
+        console.log(links);
+        generateNodes();
+        drawArcs();
+        nodeMarks.render();
+        linkMarks.render();
+      });
+    vis.render();
     </script>
   </div></div></body>
 </html>
