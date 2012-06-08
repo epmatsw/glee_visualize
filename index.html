@@ -1,7 +1,6 @@
 <html>
   <head>
-    <title>Les Mis&eacute;rables Arc</title>
-    <link type="text/css" rel="stylesheet" href="ex.css?3.2"/>
+    <title>Glee!</title>
     <script type="text/javascript" src="protovis.min.js"></script>
     <script type="text/javascript" src="counts.js"></script>
     <style type="text/css">
@@ -21,7 +20,7 @@ var vis = new pv.Panel()
     .height(510)
     .bottom(90);
   var files = [];
-  var links = [];    
+  var links = [];
   for(var i = 0; i < filecounts.length; i++)
   {
     files.push(filecounts[i].file.replace("/Users/willstamper/github/iron/client/public/","").replace(".coffee",""));
@@ -31,12 +30,14 @@ var vis = new pv.Panel()
     for(var j = 0; j < filecounts[i].counts.length; j++)
     {
       var s = i;
-      console.log(filecounts[i].counts[j].path);
       var t = files.indexOf(filecounts[i].counts[j].path);
       var v = Number(filecounts[i].counts[j].count);
-      if(t!=-1)
+      if(v==0)
       {
-        console.log(s + " " + t + " " + v);
+        console.log(files[i].substring(files[i].lastIndexOf("/")+1) + " imports " + filecounts[i].counts[j].name + " for no reason...");
+      }
+      else if(t!=-1)
+      {
         links.push({"source":s, "target":t, "value":v});
       }
     }
@@ -50,6 +51,7 @@ var vis = new pv.Panel()
   var arc = vis.add(pv.Layout.Arc)
     .nodes(nodes)
     .links(links)
+    .sort(function(a,b) b.linkDegree - a.linkDegree)
 
 arc.link.add(pv.Line);
 
