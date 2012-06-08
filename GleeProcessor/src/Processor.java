@@ -33,6 +33,8 @@ public class Processor
 		{
 			read(new File(line));
 			line = in.readLine();
+      if(line!=null)
+        System.out.print(",");
 		}
 		System.out.println("]");
 	}
@@ -101,9 +103,8 @@ public class Processor
 			if(i < pNames.size()-1)
 				System.out.println("{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"") + ",\"count\":\""+counts[i]+"\"},");
 			else
-				System.out.println("{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"") + ",\"count\":\""+counts[i]+"\"}]},");
+				System.out.println("{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"") + ",\"count\":\""+counts[i]+"\"}]}");
 		}
-		//addToMap();
 	}
 	public static void addToMap()
 	{
