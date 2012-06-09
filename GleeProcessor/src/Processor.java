@@ -27,7 +27,7 @@ public class Processor
 		browser.showOpenDialog(null);
 		File f = browser.getSelectedFile();
 		BufferedReader in = new BufferedReader(new FileReader(f));
-		System.out.println("[");
+		System.out.println("var filecounts = [");
 		String line = in.readLine();
 		while(line != null)
 		{
