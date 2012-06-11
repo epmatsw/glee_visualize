@@ -10,7 +10,7 @@ public class Processor
 	{
 		try
 		{
-			start();
+			start(args);
 		} 
 		catch (IOException e)
 		{
@@ -22,22 +22,45 @@ public class Processor
 	static ArrayList<String> pPaths = new ArrayList<String>();
 	static HashMap<String, String> pathMap = new HashMap<String, String>();
 	static HashMap<String, Integer> countMap = new HashMap<String, Integer>();
-	public static void start() throws IOException
+  static String totalResult = "";
+	public static void start(String[] args) throws IOException
 	{
-		browser.showOpenDialog(null);
-		File f = browser.getSelectedFile();
+    File f;
+    if(args.length >= 1)
+    {
+      f = new File(args[0]);
+    }
+    else
+    {
+      if(browser.showOpenDialog(null)==JFileChooser.CANCEL_OPTION)
+      {
+        System.exit(0);
+      }
+      f = browser.getSelectedFile();
+    }
 		BufferedReader in = new BufferedReader(new FileReader(f));
-		System.out.println("var filecounts = [");
+
+		totalResult = "var filecounts = [";
 		String line = in.readLine();
 		while(line != null)
 		{
       String temp = read(new File(line));
 			line = in.readLine();
       if(line == null)
-		    System.out.println("]");
+		    totalResult = totalResult + "]";
       else
-        System.out.print(temp);
+        totalResult = totalResult + temp;
 		}
+
+    if(args.length >= 2)
+    {
+      PrintStream jsonPrinter = new PrintStream(args[1]);
+      jsonPrinter.print(totalResult);
+    }
+    else
+    {
+      System.out.println(totalResult);
+    }
 	}
 	public static String read(File f) throws FileNotFoundException
 	{
@@ -95,15 +118,15 @@ public class Processor
 				pPaths.add(s);
 			pNames.add(s.trim().replace("\\", ""));
 		}	
-		System.out.println("{\"file\":\"" + f.toString() + "\",\"counts\":[");
+		totalResult = totalResult + "{\"file\":\"" + f.toString() + "\",\"counts\":[";
 		counts = new int[pNames.size()];
 		for(int i = 0; i < pNames.size(); i++)
 		{
 			counts[i] = countString(theRest, pNames.get(i));
 			if(i < pNames.size()-1)
-				System.out.println("{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"").replace("\\","") + ",\"count\":\""+counts[i]+"\"},");
+				totalResult = totalResult + "{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"").replace("\\","") + ",\"count\":\""+counts[i]+"\"},\n";
 			else
-				System.out.println("{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"").replace("\\","") + ",\"count\":\""+counts[i]+"\"}]}");
+				totalResult = totalResult + "{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"").replace("\\","") + ",\"count\":\""+counts[i]+"\"}]}\n";
 		}
     return(",");
 	}
