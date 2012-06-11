@@ -1,7 +1,6 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.regex.*;
 
 import javax.swing.JFileChooser;
 public class Processor 
@@ -20,8 +19,6 @@ public class Processor
 	static JFileChooser browser = new JFileChooser("/Users/wxstamper/github/Iron/client/public/modes/ready_training");
 	static ArrayList<String> pNames = new ArrayList<String>();
 	static ArrayList<String> pPaths = new ArrayList<String>();
-	static HashMap<String, String> pathMap = new HashMap<String, String>();
-	static HashMap<String, Integer> countMap = new HashMap<String, Integer>();
   static String totalResult = "";
 	public static void start(String[] args) throws IOException
 	{
@@ -133,12 +130,10 @@ public class Processor
 	public static int countString(String text, String target)
 	{
 		int count = 0;
-		int location = 0;
-		while(text.indexOf(target, location)!=-1)
-		{
-			count++;
-			location = text.indexOf(target, location)+1;
-		}
-		return count;
+    Pattern p = Pattern.compile(target+"[\\[\\(\\.]");
+    Matcher m = p.matcher(text);
+    while(m.find())
+      count++;
+    return count;
 	}
 }
