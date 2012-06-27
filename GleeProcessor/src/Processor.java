@@ -3,14 +3,14 @@ import java.util.ArrayList;
 import java.util.regex.*;
 
 import javax.swing.JFileChooser;
-public class Processor 
+public class Processor
 {
 	public static void main(String[] args) throws FileNotFoundException
 	{
 		try
 		{
 			start(args);
-		} 
+		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
@@ -77,7 +77,7 @@ public class Processor
 					return("");
 				if(line.contains(")"))
 					break;
-			} 
+			}
 			catch (IOException e)
 			{
 				e.printStackTrace();
@@ -114,7 +114,7 @@ public class Processor
 			if(s.length()==0)
 				pPaths.add(s);
 			pNames.add(s.trim().replace("\\", ""));
-		}	
+		}
 		totalResult = totalResult + "{\"file\":\"" + f.toString() + "\",\"counts\":[";
 		counts = new int[pNames.size()];
 		for(int i = 0; i < pNames.size(); i++)
@@ -124,7 +124,14 @@ public class Processor
 				totalResult = totalResult + "{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"").replace("\\","") + ",\"count\":\""+counts[i]+"\"},\n";
 			else
 				totalResult = totalResult + "{\"name\":\"" + pNames.get(i) + "\",\"path\":" + pPaths.get(i).replace("'", "\"").replace("\\","") + ",\"count\":\""+counts[i]+"\"}]}\n";
+      if(counts[i]==0 && !pNames.get(i).contains("template"))
+      {
+        String fileName = f.toString();
+        fileName = fileName.substring(fileName.lastIndexOf("/")+1);
+        System.out.println(fileName + " doesn't need to import " + pNames.get(i));
+      }
 		}
+    System.out.println("\n");
     return(",");
 	}
 	public static int countString(String text, String target)
